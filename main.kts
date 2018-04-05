@@ -4,13 +4,111 @@ println("UW Homework: Simple Kotlin")
 
 // write a "whenFn" that takes an arg of type "Any" and returns a String
 
+fun whenFn(x: Any) : String {
+    return when(x) {
+        "Hello" -> "world"
+        is String -> "Say what?"
+        0 -> "zero"
+        1 -> "one"
+        in 2..10 -> "low number"
+        is Byte, is Int, is Float, is Double, is Short, is Long -> "I don't understand" //"a number"
+        else -> {
+            "I don't understand"
+        }
+    }
+}
+
 // write an "add" function that takes two Ints, returns an Int, and adds the values
+
+fun add (lhs: Int, rhs: Int) : Int = lhs + rhs
+
 // write a "sub" function that takes two Ints, returns an Int, and subtracts the values
+
+fun sub (lhs: Int, rhs: Int) : Int = lhs - rhs
+
 // write a "mathOp" function that takes two Ints and a function (that takes two Ints and returns an Int), returns an Int, and applies the passed-in-function to the arguments
+
+fun mathOp (lhs: Int, rhs: Int, innerFunction: (Int, Int) -> Int) : Int {
+    return innerFunction(lhs, rhs)
+}
 
 // write a class "Person" with first name, last name and age
 
+class Person(var firstName: String, var lastName: String, var age: Int) {
+    val debugString : String by lazy{
+        "[Person firstName:${firstName} lastName:${lastName} age:${age}]"
+    }
+}
+
 // write a class "Money"
+
+class Money {
+    constructor(amount: Int, currency: String) {
+        this._currencyInGBP = convertToGBP(amount, currency)
+        this.amount = amount
+        this.currency = currency
+    }
+
+    var amount: Int
+        set(value) {
+            require(value > 0) { "Given amount must be greater than zero" }
+            field = value
+        }
+
+    var currency: String
+        set(value) {
+            when(value) {
+                "USD", "EUR", "CAN", "GBP" -> {
+                    field = value
+                }
+                else -> {
+                    throw IllegalArgumentException("Currency must be USD, EUR, CAN or GBP")
+                }
+            }
+        }
+
+    private var _currencyInGBP : Double
+    
+    fun convert(targetCurrency : String) : Money {
+        val newAmt = when(targetCurrency) {
+            "GBP" -> this._currencyInGBP
+            "USD" -> this._currencyInGBP * 2.0
+            "EUR" -> this._currencyInGBP * 3.0
+            "CAN" -> this._currencyInGBP * 2.5
+            else -> {
+                throw IllegalArgumentException("Currency must be USD, EUR, CAN or GBP") 
+            }
+        }
+
+        return Money(newAmt.toInt(), targetCurrency)
+    }
+
+    operator fun plus(other: Money): Money {
+        var convertedOther = other.convert(this.currency)
+        return Money(this.amount + convertedOther.amount, this.currency)
+    }
+
+    private fun convertToGBP(amount: Int, currency: String) : Double {
+        return when(currency) {
+            "USD" -> amount.toDouble() / 2.0
+            "EUR" -> amount.toDouble() / 3.0
+            "CAN" -> amount.toDouble() / 2.5
+            else -> {
+                amount.toDouble()
+            }
+        }
+    }
+}
+
+// My own stupid tests
+var x = Money(1, "GBP")
+var z = Money(3, "EUR")
+var w = x + z
+var y = w.convert("USD")
+print(y.amount)
+print(" ")
+println(y.currency)
+
 
 // ============ DO NOT EDIT BELOW THIS LINE =============
 
